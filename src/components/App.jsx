@@ -7,7 +7,7 @@ import ContactsPage from './pages/ContactsPage';
 export function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      <Route path="/" index element={<Layout />}>
         <Route path="register" element={<RegisterPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="contacts" element={<ContactsPage />} />
