@@ -1,20 +1,17 @@
-import Form from './Form';
-import ContactsList from './ContactsList';
-import Filter from './Filter';
-import { Section, Title } from './App.styled';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './Layout/Layout';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import ContactsPage from './pages/ContactsPage';
 
 export function App() {
   return (
-    <>
-      <Section>
-        <Title>Phonebook</Title>
-        <Form />
-      </Section>
-      <Section>
-        <Title>Contacts</Title>
-        <Filter />
-        <ContactsList />
-      </Section>
-    </>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="contacts" element={<ContactsPage />} />
+      </Route>
+    </Routes>
   );
 }
