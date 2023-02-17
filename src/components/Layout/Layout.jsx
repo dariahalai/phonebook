@@ -1,16 +1,17 @@
-import Navigation from "components/Navigation/Navigation";
-import { Suspense } from "react";
-import { Outlet } from "react-router-dom";
+
+import Sidebar from "components/Sidebar/Sidebar";
+// import { Suspense } from "react";
+// import { Outlet } from "react-router-dom";
 
 import { Container } from "./Layout.styled";
 
 const Layout =()=>{
 return(
     <Container>
-        <Navigation/>
-        <Suspense fallback={null}>
+       <Sidebar/>
+        {/* <Suspense fallback={null}>
         <Outlet/>
-        </Suspense>
+        </Suspense> */}
     </Container>
 )
 }

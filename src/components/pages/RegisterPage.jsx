@@ -1,45 +1,43 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { authRegisterThunk } from 'redux/auth/auth.thunk';
+
+const initialState = {
+  name: '',
+  email: '',
+  password: '',
+};
 
 const RegisterPage = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  // const dispatch = useDispatch();
+  const [values, setValues] = useState(initialState);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = e => {
     const { name, value } = e.target;
-    switch (name) {
-      case 'username':
-        setUsername(value);
-        break;
-      case 'email':
-        setEmail(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
-      default:
-        return;
+    setValues(prev => ({ ...prev, [name]: value }));
+  };
+  const handleSubmit = async e => {
+    e.preventDefault();
+    try {
+      await  dispatch(authRegisterThunk(values)).unwrap();
+      navigate('/contacts',{replace:true})
+      // add toast
+    } catch (error) {
+      // add toast
     }
   };
-  const handleSubmit = e => {
-    e.preventDefault();
-    //   dispatch(addContactsThunk({ name, phone }));
-    setUsername('');
-    setEmail('');
-    setPassword('');
-  };
-
   return (
     <>
       <h2>Let's Sign up</h2>
       <form onSubmit={handleSubmit}>
         <label>
-          Username
+          Name
           <input
             type="text"
-            name="username"
-            value={username}
+            name="name"
+            value={values.name}
             onChange={handleChange}
             placeholder="Enter username"
             required
@@ -50,7 +48,7 @@ const RegisterPage = () => {
           <input
             type="email"
             name="email"
-            value={email}
+            value={values.email}
             onChange={handleChange}
             placeholder="Enter email"
             required
@@ -61,7 +59,7 @@ const RegisterPage = () => {
           <input
             type="password"
             name="password"
-            value={password}
+            value={values.password}
             onChange={handleChange}
             placeholder="Enter password"
             required

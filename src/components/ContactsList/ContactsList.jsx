@@ -29,11 +29,11 @@ const ContactsList = () => {
   return (
     <ul>
       {!isLoading && !error &&
-        (visibleContacts.map(({ id, name, phone }) => (
+        (visibleContacts.map(({ id, name, number }) => (
           <ContactItem key={id}>
             <ContactName>
               {name[0].toUpperCase() + name.substring(1)} :
-              <ContactNumber>{phone}</ContactNumber>
+              <ContactNumber>{number}</ContactNumber>
             </ContactName>
             <Button
               type="button"

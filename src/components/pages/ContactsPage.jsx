@@ -7,7 +7,6 @@ const ContactsPage = () =>{
     return(
         <>
         <Section>
-          <Title>Phonebook</Title>
           <Form />
         </Section>
         <Section>

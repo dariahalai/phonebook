@@ -5,7 +5,7 @@ import { Label, Input, Button, FormContainer } from './Form.styled';
 
 const Form = () => {
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [number, setNumber] = useState('');
   const dispatch = useDispatch();
 
   const handleChange = e => {
@@ -15,7 +15,7 @@ const Form = () => {
         setName(value);
         break;
       case 'number':
-        setPhone(value);
+        setNumber(value);
         break;
       default:
         return;
@@ -23,9 +23,9 @@ const Form = () => {
   };
   const handleSubmit = e => {
     e.preventDefault();
-    dispatch(addContactsThunk({ name, phone }));
+    dispatch(addContactsThunk({ name, number }));
     setName('');
-    setPhone('');
+    setNumber('');
   };
 
   return (
@@ -49,7 +49,7 @@ const Form = () => {
           <Input
             type="tel"
             name="number"
-            value={phone}
+            value={number}
             onChange={handleChange}
             placeholder="Enter number"
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"

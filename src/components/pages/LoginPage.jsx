@@ -1,28 +1,30 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { authLoginThunk } from 'redux/auth/auth.thunk';
 
+const initialState = {
+  email: '',
+  password: '',
+};
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  // const dispatch = useDispatch();
+  const [values, setValues] = useState(initialState);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = e => {
     const { name, value } = e.target;
-    switch (name) {
-      case 'username':
-        setUsername(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
-      default:
-        return;
-    }
+    setValues(prev => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    //   dispatch(addContactsThunk({ name, phone }));
-    setUsername('');
-    setPassword('');
+    try {
+      await dispatch(authLoginThunk(values)).unwrap();
+      navigate('/contacts',{replace:true})
+      // add toast
+    } catch (error) {
+      // add toast
+    }
   };
 
   return (
@@ -30,13 +32,13 @@ const LoginPage = () => {
       <h2>Let's Log In</h2>
       <form onSubmit={handleSubmit}>
         <label>
-          Username
+          Email
           <input
             type="text"
-            name="username"
-            value={username}
+            name="email"
+            value={values.email}
             onChange={handleChange}
-            placeholder="Enter username"
+            placeholder="Enter email"
             required
           />
         </label>
@@ -45,7 +47,7 @@ const LoginPage = () => {
           <input
             type="password"
             name="password"
-            value={password}
+            value={values.password}
             onChange={handleChange}
             placeholder="Enter password"
             required
