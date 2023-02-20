@@ -1,46 +1,48 @@
-import UserMenu from 'components/UserMenu/UserMenu';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { selectAuthToken } from 'redux/auth/auth.selectors';
-import styled from 'styled-components';
-import { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Stack } from '@chakra-ui/react';
+
 const Navigation = () => {
   const token = useSelector(selectAuthToken);
   return (
-   <>
     <nav>
-      <ul>
-        {!token ? (
-          <>
-            <li>
-              <NavItem to="login">Login</NavItem>
-            </li>
-            <li>
-              <NavItem to="register">Register</NavItem>
-            </li>
-          </>
-        ) : (
+      <Stack as="ul"  direction="raw" spacing={1} >
+        <li>
+          <Link
+            as={NavLink}
+            fontSize="lg"
+            fontWeight='500'
+            p={2}
+            mr={1}
+            borderRadius={'12px'}
+            to={'/'}
+            _hover={{ bg: 'red.400', color: 'white' }}
+            _activeLink={{ bg: 'red.500', color: 'white' }}
+          >
+            Home
+          </Link>
+        </li>
+        {token && (
           <li>
-            <UserMenu/>
-            <NavItem to="contacts">Contacts</NavItem>
+            <Link
+              as={NavLink}
+              fontSize="lg"
+              fontWeight='500'
+              p={2}
+              mr={1}
+              borderRadius={'12px'}
+              to={'contacts'}
+              _hover={{ bg: 'red.400', color: 'white' }}
+              _activeLink={{ bg: 'red.500', color: 'white' }}
+            >
+              Contacts
+            </Link>
           </li>
         )}
-      </ul>
+      </Stack>
     </nav>
-     <Suspense fallback={null}>
-     <Outlet />
-   </Suspense>
-   </>
   );
 };
-
-const NavItem = styled(NavLink)`
-  text-decoration: none;
-  color: black;
-  &.active {
-    color: red;
-  }
-`;
 
 export default Navigation;

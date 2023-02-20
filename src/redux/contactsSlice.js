@@ -1,16 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { nanoid } from 'nanoid';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { STATUS } from 'constants/constants';
+
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import {
   addContactsThunk,
   getContactsThunk,
   deleteContactByIdThunk,
+  refreshContactByIdThunk,
 } from './contacts.thunk';
 
 const contactsInitState = {
   contacts: [],
-  isLoading: false,
-  error: null,
+  status: STATUS.idle,
 };
 
 const contactsSlice = createSlice({
@@ -18,47 +19,56 @@ const contactsSlice = createSlice({
   initialState: contactsInitState,
   extraReducers: builder => {
     builder
-      .addCase(getContactsThunk.pending, state => {
-        state.isLoading = true;
-      })
       .addCase(getContactsThunk.fulfilled, (state, { payload }) => {
-        state.isLoading = false;
+        state.status = STATUS.success;
         state.contacts = payload;
       })
-      .addCase(getContactsThunk.rejected, (state, { payload }) => {
-        state.isLoading = false;
-        state.error = payload;
-      })
-      .addCase(addContactsThunk.pending, state => {
-        state.isLoading = true;
-      })
       .addCase(addContactsThunk.fulfilled, (state, { payload }) => {
-        state.isLoading = false;
-        const newContact = {
-          id: nanoid(),
-          ...payload,
-        };
-        state.contacts.some(({ name }) => name === payload.name)
-          ? Notify.warning(`${newContact.name} is already in contacts`)
-          : state.contacts.push(newContact);
-      })
-      .addCase(addContactsThunk.rejected, (state, { payload }) => {
-        state.isLoading = false;
-        state.error = payload;
-      })
-      .addCase(deleteContactByIdThunk.pending, state => {
-        state.isLoading = true;
+        state.status = STATUS.success;
+        const newContact = payload;
+        if (state.contacts.some(({ name }) => name === payload.name)) {
+          Notify.warning(`${newContact.name} is already in contacts`);
+        } else {
+          state.contacts.push(newContact);
+          Notify.success('Your contact created successfully!');
+        }
       })
       .addCase(deleteContactByIdThunk.fulfilled, (state, { payload }) => {
-        state.isLoading = false;
+        state.status = STATUS.success;
         state.contacts = state.contacts.filter(
           contact => contact.id !== payload.id
         );
+        Notify.success('Your contact deleted successfully!');
       })
-      .addCase(deleteContactByIdThunk.rejected, (state, { payload }) => {
-        state.isLoading = false;
-        state.error = payload;
-      });
+      .addCase(refreshContactByIdThunk.fulfilled, (state, { payload }) => {
+        state.status = STATUS.success;
+        const { id, name, number } = payload;
+        const idx = state.contacts.findIndex(contact => contact.id === id);
+        state.contacts[idx] = { id, name, number };
+        Notify.success('Your contact updated successfully!');
+      })
+      .addMatcher(
+        isAnyOf(
+          getContactsThunk.pending,
+          addContactsThunk.pending,
+          deleteContactByIdThunk.pending,
+          refreshContactByIdThunk.pending
+        ),
+        state => {
+          state.status = STATUS.loading;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          getContactsThunk.rejected,
+          addContactsThunk.rejected,
+          deleteContactByIdThunk.rejected,
+          refreshContactByIdThunk.rejected
+        ),
+        state => {
+          state.status = STATUS.error;
+        }
+      );
   },
 });
 

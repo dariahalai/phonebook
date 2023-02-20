@@ -38,3 +38,15 @@ export const deleteContactByIdThunk = createAsyncThunk(
     }
   }
 );
+
+export const refreshContactByIdThunk = createAsyncThunk(
+  'contacts/refreshContact',
+  async ({id,name,number}, { rejectWithValue }) => {
+    try {
+      const { data } = await privateApi.patch(`/contacts/${id}`,{name,number});
+      return data;
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  }
+);

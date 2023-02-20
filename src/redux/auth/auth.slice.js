@@ -1,10 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
+import { isAnyOf } from '@reduxjs/toolkit';
 
-
-import { authRegisterThunk, authLoginThunk, authLogOutThunk } from './auth.thunk';
+import {
+  authRegisterThunk,
+  authLoginThunk,
+  authLogOutThunk,
+} from './auth.thunk';
 import { STATUS } from 'constants/constants';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const authInitState = {
   values: null,
@@ -18,42 +23,47 @@ const authSlice = createSlice({
   initialState: authInitState,
   extraReducers: builder => {
     builder
-      .addCase(authRegisterThunk.pending, state => {
-        state.status = STATUS.pending;
-      })
       .addCase(authRegisterThunk.fulfilled, (state, { payload }) => {
         state.status = STATUS.success;
         state.values = payload.user;
         state.token = payload.token;
         state.isLoggedIn = true;
-      })
-      .addCase(authRegisterThunk.rejected, state => {
-        state.status = STATUS.error;
-      })
-      .addCase(authLoginThunk.pending, state => {
-        state.status = STATUS.pending;
+        Notify.success('Welcome!');
       })
       .addCase(authLoginThunk.fulfilled, (state, { payload }) => {
         state.status = STATUS.success;
         state.values = payload.user;
         state.token = payload.token;
+        Notify.success('Welcome back!');
         state.isLoggedIn = true;
       })
-      .addCase(authLoginThunk.rejected, state => {
-        state.status = STATUS.error;
-      })
-      .addCase(authLogOutThunk.pending, state => {
-        state.status = STATUS.pending;
-      })
-      .addCase(authLogOutThunk.fulfilled, (state) => {
-        state.status = authInitState.status;
+      .addCase(authLogOutThunk.fulfilled, state => {
+        state.status = STATUS.success;
         state.values = authInitState.values;
         state.token = authInitState.token;
         state.isLoggedIn = authInitState.isLoggedIn;
       })
-      .addCase(authLogOutThunk.rejected, state => {
-        state.status = STATUS.error;
-      })
+      .addMatcher(
+        isAnyOf(
+          authLogOutThunk.pending,
+          authLoginThunk.pending,
+          authRegisterThunk.pending
+        ),
+        state => {
+          state.status = STATUS.loading;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          authLogOutThunk.rejected,
+          authLoginThunk.rejected,
+          authRegisterThunk.rejected
+        ),
+        state => {
+          state.status = STATUS.error;
+          Notify.failure('Incorrect login or password');
+        }
+      );
   },
 });
 
@@ -63,7 +73,4 @@ const persistConfig = {
   whitelist: ['token'],
 };
 
-export const authReducer = persistReducer(
-  persistConfig,
-  authSlice.reducer
-);
+export const authReducer = persistReducer(persistConfig, authSlice.reducer);
